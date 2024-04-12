@@ -1,20 +1,23 @@
 import os
-import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
 from dotenv import load_dotenv
 from utils.b2 import B2
-from utils.modeling import *
-
 REMOTE_DATA = "cnn_subset.csv"
 
 load_dotenv()
 
+
+# ------------------------------------------------------
+#                      APP CONSTANTS
+# ------------------------------------------------------
 # load Backblaze connection
 b2 = B2(endpoint=os.environ['B2_ENDPOINT'],
-        key_id=os.environ['B2_KEYID'],
-        secret_key=os.environ['B2_applicationKey'])
+         key_id=os.environ['B2_keyID'],
+         secret_key=os.environ['B2_applicationKey'])
 
+
+@st.cache_data
 def get_data():
     # collect data frame of reviews and their sentiment
     b2.set_bucket(os.environ['B2_BUCKETNAME'])
@@ -25,7 +28,6 @@ def get_data():
 df = get_data()
 
 st.title("The length of the articles correlate with the length of the highlights?")
-
 # Calculate the length of the article and the highlight
 df['article_length'] = df['article'].str.len()
 df['highlight_length'] = df['highlights'].str.len()
