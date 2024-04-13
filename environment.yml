@@ -9,6 +9,6 @@ dependencies:
     - ipykernel
     - vaderSentiment
     - plotly==5.19.0
-    - streamlit
+    - streamlit >= 1.9.2
     # - scikit-learn
     # - seaborn
