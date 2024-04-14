@@ -77,14 +77,11 @@ def main():
     df = get_data()
 
     if df is not None:
-        # User input for article selection
-        article_index = st.selectbox('Select an article index:', df.index)
+        # User input for article link
+        article_url = st.text_input('Enter the URL of a CNN article')
 
         if st.button('Generate Summary'):
             try:
-                # Get the selected article's URL
-                article_url = df.loc[article_index, 'url']
-
                 # Extract text content from the article URL
                 article_text = extract_text_from_url(article_url)
 
