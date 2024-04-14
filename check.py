@@ -11,6 +11,9 @@ from nltk.stem import PorterStemmer
 
 from dotenv import load_dotenv
 from utils.b2 import B2
+import nltk
+nltk.download('punkt')
+
 
 
 # Load environment variables
