@@ -1,19 +1,15 @@
-import string
 import os
+import subprocess
+import string
 import streamlit as st
-import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from transformers import pipeline
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
-
 from dotenv import load_dotenv
 from utils.b2 import B2
-import nltk
-nltk.download('punkt')
-
 
 
 # Load environment variables
@@ -110,3 +106,22 @@ def main():
 # Run the Streamlit app
 if __name__ == '__main__':
     main()
+
+# Path to the Python interpreter within the streamlit environment
+python_interpreter = r"C:\Users\SHREYA\miniconda3\envs\streamlit\python.exe"
+
+# Path to the Streamlit app script
+streamlit_app_script = "app.py"
+
+# Command to run the Streamlit app with the specified Python interpreter
+command = [python_interpreter, "-m", "streamlit.cli", "run", streamlit_app_script]
+
+# Run the command
+process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+# Wait for the process to finish and capture the output
+stdout, stderr = process.communicate()
+
+# Display the output
+print(stdout.decode())
+print(stderr.decode())
