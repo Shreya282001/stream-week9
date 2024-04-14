@@ -1,16 +1,15 @@
 import os
-import matplotlib.pyplot as plt
+import string
 import streamlit as st
 from dotenv import load_dotenv
 from utils.b2 import B2
-import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from transformers import pipeline
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
-import string
+
 
 REMOTE_DATA = "cnn_newsubset.csv.csv"
 
