@@ -3,7 +3,14 @@ import matplotlib.pyplot as plt
 import streamlit as st
 from dotenv import load_dotenv
 from utils.b2 import B2
-
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+from transformers import pipeline
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
+import string
 
 REMOTE_DATA = "cnn_newsubset.csv.csv"
 
@@ -29,18 +36,62 @@ def get_data():
 # Retrieve the DataFrame
 df = get_data()
 
-st.title("The length of the articles correlate with the length of the highlights?")
-# Calculate the length of the article and the highlight
-df['article_length'] = df['article'].str.len()
-df['highlight_length'] = df['highlights'].str.len()
+def preprocess_text(text):
+    # Lowercase the text
+    text = text.lower()
+    
+    # Tokenize the text
+    tokens = word_tokenize(text)
+    
+    # Remove punctuation
+    tokens = [token for token in tokens if token not in string.punctuation]
+    
+    # Remove stopwords
+    stop_words = set(stopwords.words('english'))
+    tokens = [token for token in tokens if token not in stop_words]
+    
+    # Perform stemming
+    stemmer = PorterStemmer()
+    tokens = [stemmer.stem(token) for token in tokens]
+    
+    # Join the tokens back into text
+    preprocessed_text = ' '.join(tokens)
+    
+    return preprocessed_text
 
-# Plot the data
-fig = plt.figure(figsize=(10, 6))
-plt.scatter(df['article_length'], df['highlight_length'], color='skyblue')
-plt.xlabel('Length of Article')
-plt.ylabel('Length of Highlight')
-plt.title('Relationship between Article and Highlight Lengths')
-plt.show()
+# Function to extract text content from CNN article URL
+def extract_text_from_url(article_url):
+    response = requests.get(article_url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    paragraphs = soup.find_all('p')
+    text_content = ' '.join([paragraph.text for paragraph in paragraphs])
+    return text_content
 
-st.pyplot(fig)
-st.dataframe(df.head(25))
+# Streamlit app
+def main():
+    st.title('CNN Article Summarizer')
+
+    # User input for article link
+    article_url = st.text_input('Enter the URL of a CNN article')
+
+    if st.button('Generate Summary'):
+        try:
+            # Extract text content from the article URL
+            article_text = extract_text_from_url(article_url)
+
+            # Preprocess the article text
+            preprocessed_text = preprocess_text(article_text)
+
+            # Initialize the summarization pipeline
+            summarizer = pipeline("summarization")
+
+            # Generate summary
+            summary = summarizer(preprocessed_text, max_length=150, min_length=30, do_sample=False)
+
+            # Display the summary in bullet points
+            st.write('**Summary:**')
+            for sentence in summary[0]['summary_text'].split('.'):
+                st.write(f'- {sentence.strip()}')
+
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
